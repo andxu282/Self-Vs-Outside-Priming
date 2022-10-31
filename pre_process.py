@@ -2,26 +2,13 @@ import sys
 from os import listdir, makedirs
 from os.path import isfile, join, dirname
 import csv
+from utils import get_utterances
 
 # folder path for the files we want to run the script on
 def prune_files(path, file):
-    init = 1
-    utterances = []
-    utterances.append([])
-
-    with open(join(path, file), "r") as f:
-        # breaks up file into utterances using the utterance_id found in the tsv
-        for idx, line in enumerate(f.readlines()[1:]):
-            stripped = line.replace('\n', '').split('\t')
-            try:
-                if int(stripped[1]) != init: 
-                    utterances.append([])
-                    init = int(stripped[1])
-                utterances[init-1].append((stripped[3], stripped[8], stripped[9]))
-            except IndexError:
-                # this is only here to skip the last row which denotes the number of rows
-                pass
-
+    filepath = join(path, file)
+    utterances = get_utterances(filepath)
+    
     # transforms the current un-altered list of utterances to a summarized version
     # summarized keeps track of whether a codeswitch happened, the language the
     # utterance switched to, the speaker, and the index of where you can find it
